@@ -1,0 +1,23 @@
+#:import dp kivy.metrics.dp
+
+<UncrumpledEditor>:
+    workbench: None
+    commandpane: None
+
+    # size_hint_y: None
+    # height: root.height - dp(50)
+    TabbedPanelItem:
+        text: 'some text'
+        TextInput:
+    TabbedPanelItem:
+        text: 'some text'
+        TextInput:
+    BoxLayout:
+        pos_hint: {'x': 0, 'y': 0}
+        CheckBox:
+            active: root.workbench and root.workbench.visible or True
+            on_active: root.workbench.visible = self.active
+        CheckBox:
+            active: root.commandpane and root.commandpane.visible or True
+            on_active: root.commandpane.visible = self.active
+        Widget:
