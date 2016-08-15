@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 
 from kivygui.rules import Style
 

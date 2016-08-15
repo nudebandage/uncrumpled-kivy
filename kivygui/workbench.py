@@ -11,6 +11,13 @@ class Workbench(FloatLayout, Style):
     def __init__(self, **kwargs):
         super().__init__()
 
+    def toggle(self):
+        if self.visible:
+            self.visible = False
+        else:
+            self.visible = True
+
+
 class WorkbenchApp(App):
     def build(self):
         return Workbench()

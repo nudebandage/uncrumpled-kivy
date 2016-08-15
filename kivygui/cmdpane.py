@@ -19,7 +19,7 @@ class CommandPane(FloatLayout, Style):
                 print('hi')
                 # self.toggle_pane()
 
-    def toggle(self, ass=None):
+    def toggle(self):
         if self.visible:
             self.visible = False
         else:
