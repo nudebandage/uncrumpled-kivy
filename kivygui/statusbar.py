@@ -1,14 +1,17 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 
-from rules import Style
+from kivygui.rules import Style
 
 class StatusBar(FloatLayout, Style):
+    def update_status(self, msg, code):
+        import pdb;pdb.set_trace()
+        self.ids.msg.text = msg
     pass
 
 class StatusBarApp(App):
     def build(self):
-        return CommandPane()
+        return StatusBar()
 
 if __name__ == '__main__':
-    StatusApp().run()
+    StatusBarApp().run()

@@ -1,11 +1,13 @@
 #:include editor.kv
 #:include cmdpane.kv
 #:include workbench.kv
+#:include statusbar.kv
 # :import util util
 <UncrumpledWindow>:
     padding: 10,10,10,10
     workbench: workbench
     commandpane: commandpane
+    statusbar: statusbar
 
     Workbench:
         canvas.before:
@@ -30,7 +32,8 @@
                 pos_hint: {'x': 0, 'y': 0}
                 Button:
                     text: "a button"
-                    # on_press: commandpane.visible = util.toggle(commandpane.visible)
+                    # on_press: root.profile_create('somfdsfsad')
+                    on_press: commandpane.toggle()
                 # CheckBox:
                     # active: root.workbench and root.workbench.visible or True
                     # on_active: root.workbench.visible = self.active
@@ -38,8 +41,8 @@
                     # active: root.commandpane and root.commandpane.visible or True
                     # on_active: root.commandpane.visible = self.active
 
-            Label:
-                text: "staus bar"
+            StatusBar:
+                id: statusbar
 
     CommandPane:
         canvas.before:

@@ -16,9 +16,10 @@ class CommandPane(FloatLayout, Style):
         print('rip')
         if modifiers == ['ctrl']:
             if keysym and keysym == ' ':
-                self.toggle_pane()
+                print('hi')
+                # self.toggle_pane()
 
-    def toggle_pane(self):
+    def toggle(self, ass=None):
         if self.visible:
             self.visible = False
         else:

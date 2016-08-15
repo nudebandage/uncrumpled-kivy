@@ -1,65 +1,48 @@
 '''
    The main window for uncrumpled
 '''
-# https://gist.github.com/tshirtman/504cf579b5d2aafb0ca1c679910307ed
-# https://gist.github.com/tshirtman/e481319b91483278203fe6c1f024c65a
+
 from kivy.app import App
 from kivy.base import KivyEventLoop
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
+from kivy.properties import StringProperty
 
 # Have to import all the components used for kv lang to use
-# from unc import ui_connect
 from kivygui.editor import UncrumpledEditor
 from kivygui.cmdpane import CommandPane
 from kivygui.workbench import Workbench
+from kivygui.statusbar import StatusBar
 from kivygui.rules import Style
+from kivygui.globals import EV, CORE
 
-# from kivygui.api import CommandsMixIn
+from kivygui.presenter import Requests
+from kivygui.presenter import Responses
 
-class CommandsMixIn():
-    def toggle(self):
-        pass
 
-def key_down_handler(_, __, keycode, keysym, modifiers, system):
-    '''
-    checks if the key has a callback bound to it and
-    runs it
-    '''
-    get_hkstring(keysym, modifiers)
-    callbacks =  system['binds']['key_down'].get(hkstring)
-    for cb in callbacks:
-        if cb not in BINDS:
-            cb()
+class UncrumpledWindow(FloatLayout, Style, Responses, Requests):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        global EV, CORE
+        self.ev = EV
+        self.core = CORE
 
-class UncrumpledWindow(FloatLayout, Style):
-    pass
 
-class ToplevelApp(App, CommandsMixIn):
+class ToplevelApp(App):
 
-    def start(self):
-        # self.core = core
-        self.ev = KivyEventLoop(self)
-        self.ev.set_debug(True)
-        self.ev.mainloop()
+    def start(self, core):
+        ''' Passing references for the event loop and core'''
+        global EV, CORE
+        ev = KivyEventLoop(self)
+        EV = ev
+        CORE = core
+        Requests.ui_init(core)
+        ev.set_debug(True)
+        ev.mainloop()
 
     def build(self):
         return UncrumpledWindow()
-
-    # def forever_and_ever(self, function):
-        # '''
-        # run a function asynchronously
-        # '''
-        # Clock.schedule_once(lambda e: self.ev.run_in_executor(None, function), 100)
-
-    # def key_action(self, _, __, keycode, keysym, modifiers):
-        # if modifiers == ['ctrl']:
-            # if keysym and keysym == ' ':
-                # self.toggle_pane()
-
-
-
 
 
 if __name__ == '__main__':
