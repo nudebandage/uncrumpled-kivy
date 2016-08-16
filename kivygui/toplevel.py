@@ -7,6 +7,7 @@ from kivy.base import KivyEventLoop
 from kivy.base import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
+from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -24,15 +25,42 @@ from kivygui.globals import EV, CORE
 from kivygui.presenter import Requests
 from kivygui.presenter import Responses
 
+from kivygui import settings
+
+
 class MyScreenManager(ScreenManager):
     pass
 
 class UncrumpledWindow(Screen, Style, Responses, Requests):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Window.bind(on_key_down=self.key_down_handler)
+        # Window.bind(on_touch_down=self.touch_handler)
+        # self.ids.commandpane.bind(on_touch_down=self.touch_handler)
+        self.bind(on_touch_down=self.touch_handler)
         global EV, CORE
         self.ev = EV
         self.core = CORE
+
+    def touch_handler(self, _, touch):
+        if self.ids.commandpane.collide_point(*touch.pos):
+            self.ids.commandpane.toggle()
+            # touch.grab(self.ids.commandpane)
+            return True
+        if self.ids.workbench.collide_point(*touch.pos):
+            self.ids.workbench.toggle()
+            return True
+        self.ids.workbench.visible = 1
+        self.ids.commandpane.visible = 1
+
+    def key_down_handler(_, __, keycode, keysym, modifiers, system):
+        '''
+        checks if the key has a callback bound to it and
+        runs it
+        '''
+        import pdb;pdb.set_trace()
+
+
 
 class ToplevelApp(App):
 
@@ -52,10 +80,11 @@ class ToplevelApp(App):
 
     def build(self):
         root = self.root
-        Clock.schedule_once(lambda e: self.finish_load(), 3)
+        Clock.schedule_once(lambda e: self.finish_load(), 2)
         return MyScreenManager()
 
 
 if __name__ == '__main__':
     ToplevelApp().run()
+
 

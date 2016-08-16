@@ -7,7 +7,7 @@ from kivygui.rules import Style
 
 
 class Workbench(FloatLayout, Style):
-    visible = BooleanProperty(True)
+    visible = BooleanProperty(False)
     def __init__(self, **kwargs):
         super().__init__()
 

@@ -7,7 +7,7 @@ from kivygui.rules import Style
 
 
 class CommandPane(FloatLayout, Style):
-    visible = BooleanProperty(True)
+    visible = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
