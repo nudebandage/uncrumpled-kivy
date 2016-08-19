@@ -7,7 +7,7 @@ from kivy.properties import StringProperty
 from kivygui.rules import Style
 
 _welcome='''
-        [size=70][font=Inconsolata]Uncrumpled[/font][/size]
+        [size=70][font=Inconsolata]uncrumpled[/font][/size]
 
         Welcome to the latest version of Uncrumpled.
         If you are new please check out the Online `Docs`
@@ -36,6 +36,7 @@ class MultiLineLabel(Label):
 
     def on_text_changed(self, widget, text):
         self.on_size(self, self.size)
+
 
 class UncrumpledEditor(TabbedPanel):
     welcome_text = StringProperty(_welcome)

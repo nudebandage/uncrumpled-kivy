@@ -8,8 +8,15 @@
 
 class Responses():
     '''run the responses from uncrumpled'''
-    def status_update(self, msg, code):
-        self.ids.statusbar.update_status(msg, code)
+    def _unc_status_update(self, msg, code):
+        self.ids.statusbar.unc_update_status(msg, code)
+
+    def _unc_show_window(self):
+        self.unc_show_window()
+
+    def _unc_welcome_screen(self):
+        self.unc_welcome_screen()
+
 
 def key_down_handler(_, __, keycode, keysym, modifiers, system):
     '''
