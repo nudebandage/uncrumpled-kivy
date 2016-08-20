@@ -92,6 +92,7 @@ class ToplevelApp(App):
         if hasattr(self, 'ev'):
             for screen in root.screens:
                 if screen.name == 'uncrumpled':
+                    self.main_window = screen # Used uncrumpled/main
                     screen.ev = self.ev
                     screen._unc_app = self.unc_app
                     screen.req_ui_init() # TODO ASYNC THIS
