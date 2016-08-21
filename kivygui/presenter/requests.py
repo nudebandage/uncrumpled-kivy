@@ -12,7 +12,10 @@ class Requests():
         def _(self, **kwargs):
             response = eval('requests.{}(self._unc_app, **kwargs)'.format(func))
             for resp_func in response:
-                eval('self._unc_{}'.format(resp_func))
+                try:
+                    eval('self._unc_{}'.format(resp_func))
+                except Exception: # JFT
+                    import pdb;pdb.set_trace()
         self.ev.run_until_complete(
                 self.ev.run_in_executor(None, _, self, **kwargs))
 
@@ -22,3 +25,6 @@ class Requests():
 
     def req_profile_create(self, profile):
         self.async_request('profile_create', profile=profile)
+
+    def req_hotkey_pressed(self, ):
+        self.async_request('hotkey_pressed', )

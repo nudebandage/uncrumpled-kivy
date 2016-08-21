@@ -12,11 +12,11 @@ class CommandPane(FloatLayout, Style):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def key_action(self, _, __, keycode, keysym, modifiers):
-        print('rip')
-        if modifiers == ['ctrl']:
-            if keysym and keysym == ' ':
-                print('hi')
+    # def key_action(self, _, __, keycode, keysym, modifiers):
+        # print('rip')
+        # if modifiers == ['ctrl']:
+            # if keysym and keysym == ' ':
+                # print('hi')
                 # self.toggle_pane()
 
     def toggle(self):
