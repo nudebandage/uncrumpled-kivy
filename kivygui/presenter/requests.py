@@ -3,6 +3,8 @@
 
     Kivy async support is pretty new so i cannot use the asyncio.coroutine etc
 '''
+import logging
+
 from uncrumpled.presenter import requests
 
 
@@ -14,8 +16,8 @@ class Requests():
             for resp_func in response:
                 try:
                     eval('self._unc_{}'.format(resp_func))
-                except Exception: # JFT
-                    import pdb;pdb.set_trace()
+                except Exception as err: # JFT
+                    logging.critical(resp_func+' '+ err)
         self.ev.run_until_complete(
                 self.ev.run_in_executor(None, _, self, **kwargs))
 

@@ -1,7 +1,7 @@
 import os
 
 import kivy
-kivy.require('1.0.6')
+# kivy.require('1.0.6')
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.floatlayout import FloatLayout

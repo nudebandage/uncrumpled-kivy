@@ -16,17 +16,18 @@ class Responses():
         self.unc_show_window()
 
     def _unc_welcome_screen(self):
-        logging.warning('unc_welcome_screen not implemented')
+        logging.warning('unc_welcome_screen')
         # self.unc_welcome_screen()
 
     def _unc_page_load(self, file):
         self.ids.editor.unc_page_load(file)
 
-    def _unc_page_close(self):
+    def _unc_page_close(self, file):
         self.ids.editor.unc_page_close(file)
 
     def _unc_system_hotkey_register(self, hotkey):
-        logging.info('binding hotkeyL ' +hotkey)
+        # TODO handle a failed register...
+        logging.info('binding hotkey ' + str(hotkey))
         self.kivy_app.hk.register(hotkey)
 
     def _unc_system_hotkey_unregister(self, hotkey):
@@ -34,6 +35,7 @@ class Responses():
 
     def _unc_profile_set_active(self, profile):
         logging.warning('profile_set_active')
+        self.active_profile = profile
         # self.kivy_app.pf.set_active(profile)
 
 
