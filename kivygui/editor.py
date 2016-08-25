@@ -1,3 +1,4 @@
+import logging
 import webbrowser
 
 from kivy.app import App
@@ -39,9 +40,23 @@ class MultiLineLabel(Label):
 
 
 class UncrumpledEditor(TabbedPanel):
-    welcome_text = StringProperty(_welcome)
+    file = None
+    gui = None
+    # welcome_text = StringProperty(_welcome)
     # def open_link(link):
         # webbrowser.open(link)
+    def unc_page_load(self, file):
+        # TODO FOCUS WINDOW, SEEK 0, 0
+        logging.info('unc_page_load '+ file)
+        self.file = file
+        self.gui = self.content.children[0]
+        with open(file, 'r') as f:
+            self.gui.text = f.read()
+
+    def unc_page_close(self, file):
+        logging.info('unc_page_close '+ file)
+        with open(file, 'w') as f:
+            f.write(self.gui.text)
 
 
 class EditorApp(App):

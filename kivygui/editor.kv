@@ -1,17 +1,16 @@
-#:import dp kivy.metrics.dp
 
 <UncrumpledEditor>:
     workbench: None
     commandpane: None
     # welcome: None
-    welcome: welcome
+    # welcome: welcome
     # welcome_text:welcome_text
     do_default_tab: False
 
-
     TabbedPanelItem:
-        id: welcome
         text: 'Welcome'
-        MultiLineLabel:
-            text: root.welcome_text
+        TextInput:
+        # id: welcome
+        # MultiLineLabel:
+            # text: root.welcome_text
 

@@ -6,6 +6,7 @@
 '''
 
 import logging
+import queue
 
 from system_hotkey import SystemHotkey
 import peasoup
@@ -40,12 +41,46 @@ class UncrumpledWindow(Screen, Style, Responses, Requests, _Config):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.window = Window
-        self.bind(on_touch_down=self.touch_handler)
+        # self.bind(on_touch_down=self.touch_handler)
+        self.hk = SystemHotkey(consumer=self.sys_hotkey_handler,
+                               check_queue_interval=0.001)
+        self.hk.register(['f7'], self.req_system_get)
+        self.queue = queue.Queue()
+        Clock.schedule_interval(lambda e: self.check_queue(), 0.01)
 
-    def unc_show_window(self):
+    def check_queue(self):
+        try:
+            func = self.queue.get(block=False)
+        except queue.Empty:
+            pass
+        else:
+            try:
+                func()
+            except Exception as err:
+                import pdb;pdb.set_trace()
+
+    def run_in_main(self, func):
+        self.queue.put(func)
+
+    # This is run in another thread, which async code doesn't play well with.
+    def sys_hotkey_handler(self, event, hotkey, args):
+        self.active_profile = 'default'
+        program, pid, = peasoup.process_exists() # TODO rename this func
+        profile = self.active_profile
+        # Mainly for testing, a hotkey has bound it's own callback
+        if args[0]:
+            self.run_in_main(args[0][0])
+        else:
+            self.run_in_main(lambda: self.req_hotkey_pressed(
+                                        profile, program, hotkey))
+
+    def unc_window_show(self):
+        logging.info('unc_window_show')
         self.window.show()
 
-    def unc_hide_window(self):
+    def unc_window_hide(self): #TODO
+        '''hide the window, also tell uncrumpled all the pages we closed'''
+        logging.info('unc_window_hide')
         self.window.hide()
 
     def touch_handler(self, _, touch): # JFT
@@ -63,17 +98,10 @@ class UncrumpledWindow(Screen, Style, Responses, Requests, _Config):
 class ToplevelApp(App):
     def start(self, unc_app):
         '''call to start the gui'''
-        self.hk = SystemHotkey(consumer=self.hotkey_consumer,
-                               check_queue_interval=0.001)
         self.unc_app = unc_app
         self.ev = KivyEventLoop(self)
         # self.ev.set_debug(True)
         self.ev.mainloop()
-
-    def hotkey_consumer(self, event, hotkey, args):
-        program, pid, = peasoup.process_exists() # TODO rename this func
-        profile = self.active_profile
-        self.req_hotkey_pressed(profile, program, hotkey)
 
     def build(self):
         root = MyScreenManager()
@@ -84,7 +112,7 @@ class ToplevelApp(App):
                 if screen.name == 'uncrumpled':
                     screen.ev = self.ev
                     screen._unc_app = self.unc_app
-                    screen.kivy_app = self
+                    # screen.kivy_app = self
                     Clock.schedule_once(lambda e: screen.setup_config(), 4)
                     screen.req_ui_init() # TODO ASYNC THIS
         return root

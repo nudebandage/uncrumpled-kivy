@@ -5,6 +5,7 @@
     e.g bind_add
 '''
 import logging
+from pprint import pprint
 
 
 class Responses():
@@ -12,8 +13,11 @@ class Responses():
     def _unc_status_update(self, msg, code):
         self.ids.statusbar.unc_update_status(msg, code)
 
-    def _unc_show_window(self):
-        self.unc_show_window()
+    def _unc_window_show(self):
+        self.unc_window_show()
+
+    def _unc_window_hide(self):
+        self.unc_window_hide()
 
     def _unc_welcome_screen(self):
         logging.warning('unc_welcome_screen')
@@ -28,15 +32,18 @@ class Responses():
     def _unc_system_hotkey_register(self, hotkey):
         # TODO handle a failed register...
         logging.info('binding hotkey ' + str(hotkey))
-        self.kivy_app.hk.register(hotkey)
+        self.hk.register(hotkey)
 
     def _unc_system_hotkey_unregister(self, hotkey):
-        self.kivy_app.hk.unregister(hotkey)
+        self.hk.unregister(hotkey)
 
     def _unc_profile_set_active(self, profile):
         logging.warning('profile_set_active')
         self.active_profile = profile
         # self.kivy_app.pf.set_active(profile)
+
+    def _unc_system_gotten(self, system):
+        pprint(system)
 
 
 def key_down_handler(_, __, keycode, keysym, modifiers, system):

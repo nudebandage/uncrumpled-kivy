@@ -1,6 +1,6 @@
 '''
     This module holds configuration settings that will need to be
-    uncrumpled/presenter
+    mostly set by -> uncrumpled/presenter
 
     they are simply here because i haven't designed the system
     for config well enough yet, and i'm lazy
