@@ -57,6 +57,7 @@ class UncrumpledWindow(Screen, Style, Responses, Requests, _Config):
             try:
                 func()
             except Exception as err:
+                # An error happend over on the backend :(
                 import pdb;pdb.set_trace()
 
     def run_in_main(self, func):
