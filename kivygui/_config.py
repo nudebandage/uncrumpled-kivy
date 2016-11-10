@@ -13,7 +13,7 @@ class _Config():
         self._keyboard = self.window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
-        self.binds['escape'] = self.window.hide
+        # self.binds['escape'] = self.window.hide
         # self.binds[('ctrl', 'f')] = self.window.hide
 
 

@@ -10,6 +10,12 @@ from pprint import pprint
 
 class Responses():
     '''run the responses from uncrumpled'''
+    def _unc_bind_add(self, hotkey, event_type, command, command_kwargs):
+        self.unc_bind_add(hotkey, event_type, command, command_kwargs)
+
+    def _unc_bind_remove(self, hotkey, event_type, command):
+        pass
+
     def _unc_status_update(self, msg, code):
         self.ids.statusbar.unc_update_status(msg, code)
 

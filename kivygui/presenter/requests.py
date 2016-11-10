@@ -16,7 +16,7 @@ class Requests():
             response = reqfunc(self._unc_app, **kwargs)
             for resp_func in response:
                 try:
-                    # if 'window_hide' in resp_func:
+                    # if 'bind_add' in resp_func:
                         # import pdb;pdb.set_trace()
                     # if 'gotten' in resp_func:
                         # import pdb;pdb.set_trace()
