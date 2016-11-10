@@ -43,8 +43,8 @@ class Keybinder():
     def _run_bind(self, callback_string):
         # Callback is meant to be handled by the gui...
         callback = callback_string.split('(')[0]
-        if hasattr(self, 'unc_' + callback):
-            eval('self.unc_' + callback_string)
+        if hasattr(self, '_unc_' + callback):
+            eval('self._unc_' + callback_string)
         # The callback must be meant for the core...
         else:
             eval('self.req_' + callback_string)
@@ -109,26 +109,6 @@ class UncrumpledWindow(Screen, Style, Responses, Requests, Keybinder):
         else:
             self.run_in_main(lambda: self.req_hotkey_pressed(
                                         profile, program, hotkey))
-
-    def unc_bind_add(self, hk, event_type, command, command_kwargs):
-        assert event_type in self.supported_bind_handlers
-        # Setup the bind handler if first time
-        if event_type not in self.active_bind_handlers:
-            handler = 'self.handler_' + event_type
-            eval('self._keyboard.bind({}={})'.format(event_type, handler))
-            self.active_bind_handlers.append(event_type)
-        command_str = '{cmd}(**{kwargs})'.format(cmd=command, kwargs=command_kwargs)
-        self.active_binds.setdefault(event_type, {})[hk] = [command_str]
-
-
-    def unc_window_show(self):
-        logging.info('unc_window_show')
-        self.window.show()
-
-    def unc_window_hide(self): #TODO
-        '''hide the window, also tell uncrumpled all the pages we closed'''
-        logging.info('unc_window_hide')
-        self.window.hide()
 
     def touch_handler(self, _, touch): # JFT
         if self.ids.commandpane.collide_point(*touch.pos):

@@ -11,19 +11,33 @@ from pprint import pprint
 class Responses():
     '''run the responses from uncrumpled'''
     def _unc_bind_add(self, hotkey, event_type, command, command_kwargs):
-        self.unc_bind_add(hotkey, event_type, command, command_kwargs)
+        assert event_type in self.supported_bind_handlers
+        # Setup the bind handler if first time
+        if event_type not in self.active_bind_handlers:
+            handler = 'self.handler_' + event_type
+            eval('self._keyboard.bind({}={})'.format(event_type, handler))
+            self.active_bind_handlers.append(event_type)
+        command_str = '{cmd}(**{kwargs})'.format(cmd=command, kwargs=command_kwargs)
+        self.active_binds.setdefault(event_type, {})[hotkey] = [command_str]
 
     def _unc_bind_remove(self, hotkey, event_type, command):
         pass
+
+    def _unc_cmdpane_toggle(self):
+        self.ids.commandpane.toggle()
+        # import pdb;pdb.set_trace()
 
     def _unc_status_update(self, msg, code):
         self.ids.statusbar.unc_update_status(msg, code)
 
     def _unc_window_show(self):
-        self.unc_window_show()
+        logging.info('unc_window_show')
+        self.window.show()
 
-    def _unc_window_hide(self):
-        self.unc_window_hide()
+    def _unc_window_hide(self): #TODO
+        '''hide the window, also tell uncrumpled all the pages we closed'''
+        logging.info('unc_window_hide')
+        self.window.hide()
 
     def _unc_welcome_screen(self):
         logging.warning('unc_welcome_screen')
