@@ -12,22 +12,29 @@ class CommandPane(FloatLayout, Style):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    # def key_action(self, _, __, keycode, keysym, modifiers):
-        # print('rip')
-        # if modifiers == ['ctrl']:
-            # if keysym and keysym == ' ':
-                # print('hi')
-                # self.toggle_pane()
-
     def toggle(self):
+        '''
+        toggle the cmd pane open or close
+        '''
         if self.visible:
             self.visible = False
         else:
             self.visible = True
 
-    # def open_pane(self):
+    def search(self):
+        '''
+        query the uncrumpled core for results from a search
+        and display them
+        '''
+        # results come back as heading and text..
+        pass
 
-    # def close_pane(self):
+    def open_search_item(self):
+        '''
+        the user wants to do something with a search result..
+        get the result and query the core for what to do
+        '''
+        pass
 
 
 class CmdPane(App):

@@ -1,5 +1,8 @@
 <CommandPane>:
+    cmdpane: cmdpane
+    searchbox: searchbox
     Label:
+        id: cmdpane
         size: root.size
         pos: root.pos
         text: "cmdpane"
@@ -9,5 +12,12 @@
             Rectangle:
                 pos: root.pos
                 size: root.size
+    TextInput:
+        id: searchbox
+        text: "search box"
+        pos: root.x, root.top - 45
+        size: root.width, 35
+        # pos_hint: None, None
+        size_hint: None, None
 
 
