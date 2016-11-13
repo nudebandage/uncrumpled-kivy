@@ -26,6 +26,11 @@ class Requests():
         self.ev.run_until_complete(
                 self.ev.run_in_executor(None, _, self, **kwargs))
 
+    def req_cmdpane_search(self, query):
+        self.async_request('cmdpane_search', query=query)
+
+    def req_cmdpane_item_open(self, item):
+        self.async_request('cmdpane_item_open', item=item)
 
     def req_ui_init(self):
         self.async_request('ui_init')

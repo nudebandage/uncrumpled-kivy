@@ -39,8 +39,9 @@ class Keybinder():
         self._keyboard = window.request_keyboard(self._keyboard_closed, self)
 
     def _keyboard_closed(self):
-        self._keyboard.unbind(on_key_down=self.handler_on_key_down)
-        self._keyboard = None
+        # self._keyboard.unbind(on_key_down=self.handler_on_key_down)
+        # self._keyboard = None
+        pass
 
     def _run_bind(self, callback_string):
         # Callback is meant to be handled by the gui...
@@ -100,7 +101,7 @@ class UncrumpledWindow(Screen, Style, Responses, Requests, Keybinder):
     def run_in_main(self, func):
         self.queue.put(func)
 
-    # This is run in another thread, which async code doesn't play well with.
+    # This is run in another thread, errors here do not get propogated due to async..
     def sys_hotkey_handler(self, event, hotkey, args):
         self.active_profile = 'default'
         program, pid, = peasoup.process_exists() # TODO rename this func

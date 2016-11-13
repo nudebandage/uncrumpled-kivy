@@ -1,6 +1,26 @@
+<SelectableLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: (.0, 0.9, .1, .3) if self.selected else (0.7, 0.5, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<RV>:
+    viewclass: 'SelectableLabel'
+    SelectableRecycleBoxLayout:
+        size_hint_y: None
+        multiselect: False
+        touch_multiselect: False
+        orientation: 'vertical'
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        height: self.minimum_height
+
 <CommandPane>:
     cmdpane: cmdpane
     searchbox: searchbox
+    recycleview: recycleview
     Label:
         id: cmdpane
         size: root.size
@@ -14,10 +34,18 @@
                 size: root.size
     TextInput:
         id: searchbox
-        text: "search box"
-        pos: root.x, root.top - 45
+        multiline: False
+        on_text: root.search()
+        pos: root.x, root.top - searchbox.height
         size: root.width, 35
-        # pos_hint: None, None
         size_hint: None, None
+
+    RV:
+        id: recycleview
+        size: self.x, searchbox.y
+        size_hint_y: None
+        pos: root.pos
+        keyboard_on_key_down: self.do()
+
 
 

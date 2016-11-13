@@ -21,11 +21,16 @@ class Responses():
         self.active_binds.setdefault(event_type, {})[hotkey] = [command_str]
 
     def _unc_bind_remove(self, hotkey, event_type, command):
-        pass
+        import pdb;pdb.set_trace()
+
+    def _unc_cmdpane_search_results(self, headings, bodies):
+        self.ids.commandpane.display_search_results(headings, bodies)
+
+    def _unc_cmdpane_ui_build(self, ui):
+        self.ids.commandpane.ui_build(ui)
 
     def _unc_cmdpane_toggle(self):
         self.ids.commandpane.toggle()
-        # import pdb;pdb.set_trace()
 
     def _unc_status_update(self, msg, code):
         self.ids.statusbar.unc_update_status(msg, code)
@@ -76,10 +81,3 @@ def key_down_handler(_, __, keycode, keysym, modifiers, system):
     for cb in callbacks:
         if cb not in BINDS:
             cb()
-
-
-    # def key_action(self, _, __, keycode, keysym, modifiers):
-        # if modifiers == ['ctrl']:
-            # if keysym and keysym == ' ':
-                # self.toggle_pane()
-
