@@ -57,7 +57,6 @@ class CommandPane(FloatLayout, Style):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.bind(on_key_down=self.do)
 
     def toggle(self):
         '''
