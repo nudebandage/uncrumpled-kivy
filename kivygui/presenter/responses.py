@@ -6,6 +6,7 @@
 '''
 import logging
 from pprint import pprint
+from functools import wraps
 
 
 class Responses():
@@ -58,9 +59,6 @@ class Responses():
         # TODO handle a failed register...
         logging.info('binding hotkey ' + str(hotkey))
         self.hk.register(hotkey)
-
-    def _unc_system_hotkey_unregister(self, hotkey):
-        self.hk.unregister(hotkey)
 
     def _unc_profile_set_active(self, profile):
         logging.warning('profile_set_active')

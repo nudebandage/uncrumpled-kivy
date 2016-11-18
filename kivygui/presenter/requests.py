@@ -12,11 +12,12 @@ class Requests():
     # Delegate the function from uncrumpled to self._unc_
     def async_request(self, func, **kwargs):
         def _(self, **kwargs):
+            print('request sent -> ', func)
             reqfunc = eval('requests.{}'.format(func))
             response = reqfunc(self._unc_app, **kwargs)
             for resp_func in response:
                 try:
-                    # if 'bind_add' in resp_func:
+                    # if 'ui' in resp_func:
                         # import pdb;pdb.set_trace()
                     # if 'gotten' in resp_func:
                         # import pdb;pdb.set_trace()

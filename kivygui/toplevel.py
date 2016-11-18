@@ -39,9 +39,10 @@ class Keybinder():
         self._keyboard = window.request_keyboard(self._keyboard_closed, self)
 
     def _keyboard_closed(self):
-        # self._keyboard.unbind(on_key_down=self.handler_on_key_down)
-        # self._keyboard = None
+        # TODO somehow need to reopen this
         pass
+        self._keyboard.unbind(on_key_down=self.handler_on_key_down)
+        self._keyboard = None
 
     def _run_bind(self, callback_string):
         # Callback is meant to be handled by the gui...
@@ -59,7 +60,7 @@ class Keybinder():
         return json.dumps(hotkey)
 
     def handler_on_key_down(self, _, keycode, keysym, modifiers):
-        hotkey = self._make_hkstring(keysym, modifiers)
+        hotkey = self._make_hkstring(keycode[1], modifiers)
         commands = self.active_binds['on_key_down'].get(hotkey)
         with suppress(TypeError):
             for cb in commands:
@@ -142,7 +143,10 @@ class ToplevelApp(App):
         for screen in root.screens:
             if screen.name == 'uncrumpled':
                 screen.ev = self.ev
+                # Backend/Core
                 screen._unc_app = self.unc_app
+                # Main Uncrumpled Screen
+                self.unc = screen
                 # screen.kivy_app = self
                 screen.req_ui_init() # TODO ASYNC THIS
                 break
