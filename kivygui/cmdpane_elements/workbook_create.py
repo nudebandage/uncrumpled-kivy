@@ -9,6 +9,13 @@ import pdb
 
 Y = 40
 
+def add_bind(layout, widget, func, *args, **kwargs):
+    '''allows a widget to bind action against the core'''
+    if not hasattr(layout, 'mabinds'):
+        layout.mabinds = {}
+    layout.mabinds[widget] = {'func': func, 'args': args, 'kwargs': kwargs}
+
+
 class CmdPaneElement():
     def clear_values(self):
         raise NotImplementedError
@@ -39,7 +46,53 @@ class SmartText(KeyBinder, TextInput):
         self.focus_previous.focus = True
 
 
-def workbook_create():
+def _validate_on_create(name, profile, hotkey):
+    if not name:
+        return 'A name is required', 0
+    elif not profile:
+        return 'Please select a Profile', 0
+    elif not hotkey:
+        return 'A hotkey is required', 0
+    return 1, 1
+
+
+def get_no_process(text):
+    if not text:
+        return 'Please set a value for Dynamic Note Creation', 0
+    elif 'new' in text:
+        no_process = 'new'
+    elif 'nothing' in text:
+        no_process = 'nothing'
+    elif 'prompt' in text:
+        no_process = 'prompt'
+    elif 'load' in text:
+        no_process = 'load'
+        raise NotImplementedError
+    elif 'specific' in text:
+        no_process = 'specific'
+    else:
+        return 'Invalid value for no process', 0
+    return no_process, 1
+
+
+def on_create(unc, layout, widget):
+    name = layout.name.text
+    profile = layout.profile.text
+    hotkey = layout.hotkey.get()
+    msg, code = validate_on_create(name, profile, hotkey)
+    if not code:
+        unc._unc_status_update(msg, code)
+    no_process, code = get_new_process(layout.no_process.text)
+    if not code:
+        unc._unc_status_update(no_process, code)
+
+    options = {'no_process':no_process}
+
+    unc._unc_create_book(profile, name, hotkey,
+                         unc.active_profile, **options)
+
+
+def workbook_create(unc):
     '''
     return a KivyWidget to be added to the cmdpane
     '''
@@ -66,7 +119,9 @@ def workbook_create():
     layout.add_widget(hotkey)
     layout.add_widget(Label(text='Profile', **label_args))
     layout.add_widget(profile)
-    layout.add_widget(Button(text='Create', on_press = lambda x:pdb.set_trace(), **label_args))
+    # create = Button(text='Create', on_press=lambda x: on_create(unc, layout, x), **label_args)
+    create = Button(text='Create', on_press=lambda x: print('nice'), **label_args)
+    layout.add_widget(create)
 
     layout.first_focusable = lambda: name
     layout.last_focusable = lambda: profile

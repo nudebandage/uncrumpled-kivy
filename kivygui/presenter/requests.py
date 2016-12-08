@@ -36,8 +36,15 @@ class Requests():
     def req_ui_init(self):
         self.async_request('ui_init')
 
+    def req_book_create(self, profile, book, hotkey, active_profile, **kwargs):
+        self.async_request('book_create', profile=profile,
+                                          book=book,
+                                          hotkey=hotkey,
+                                          active_profile=active_profile,
+                                          **kwargs)
+
     def req_profile_create(self, profile):
-        self.async_request('profile_create', profile=profile)
+        self.async_request('profile_create', profile=profile,)
 
     def req_hotkey_pressed(self, profile, program, hotkey):
         self.async_request('hotkey_pressed', profile=profile, program=program,

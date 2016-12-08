@@ -149,8 +149,8 @@ class TimsBuilder():
         # Clean anything
         self.clean()
         # Import some element somehow
-        builder_function =  getattr(elements, ui)
-        kivy_obj = builder_function()
+        builder_function = getattr(elements, ui)
+        kivy_obj = builder_function(self.app.unc)
         return kivy_obj
 
     def screen_exists(self, manager, element: str) -> bool:
