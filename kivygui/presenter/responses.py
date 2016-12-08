@@ -67,15 +67,3 @@ class Responses():
 
     def _unc_system_gotten(self, system):
         pprint(system)
-
-
-def key_down_handler(_, __, keycode, keysym, modifiers, system):
-    '''
-    checks if the key has a callback bound to it and
-    runs it
-    '''
-    get_hkstring(keysym, modifiers)
-    callbacks =  system['binds']['key_down'].get(hkstring)
-    for cb in callbacks:
-        if cb not in BINDS:
-            cb()
