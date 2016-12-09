@@ -29,7 +29,7 @@ def _hash_key(hotkey):
     # control - shift - alt - win, and when we read back the modifers we spit them
     # out in the same value so our dictionary keys always match
     if len(hotkey) < 3:
-        return hotkey
+        return tuple(hotkey)
     else:
         new_hotkey = []
         for mod in hotkey[:-1]:
