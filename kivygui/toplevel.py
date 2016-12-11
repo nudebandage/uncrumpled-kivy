@@ -7,7 +7,6 @@
 
 import logging
 import queue
-import json
 import os
 from contextlib import suppress
 
@@ -33,38 +32,7 @@ from kivygui.splash import SplashPage
 from kivygui import settings
 from kivygui.rules import Style
 
-
-class Keybinder():
-    def setup_keybind(self, window):
-        self._keyboard = window.request_keyboard(self._keyboard_closed, self)
-
-    def _keyboard_closed(self):
-        # TODO somehow need to reopen this
-        pass
-        self._keyboard.unbind(on_key_down=self.handler_on_key_down)
-        self._keyboard = None
-
-    def _run_bind(self, callback_string):
-        # Callback is meant to be handled by the gui...
-        callback = callback_string.split('(')[0]
-        if hasattr(self, '_unc_' + callback):
-            eval('self._unc_' + callback_string)
-        # The callback must be meant for the core...
-        else:
-            eval('self.req_' + callback_string)
-
-    def _make_hkstring(self, keysym, modifiers):
-        with suppress(ValueError):
-            keysym = int(keysym)
-        hotkey = [keysym, *modifiers]
-        return json.dumps(hotkey)
-
-    def handler_on_key_down(self, _, keycode, keysym, modifiers):
-        hotkey = self._make_hkstring(keycode[1], modifiers)
-        commands = self.active_binds['on_key_down'].get(hotkey)
-        with suppress(TypeError):
-            for cb in commands:
-                self._run_bind(cb)
+from kivygui.keybinder import KeyBinder
 
 
 class MyScreenManager(ScreenManager):
@@ -73,19 +41,23 @@ class MyScreenManager(ScreenManager):
         self.current = self.current = 'uncrumpled'
 
 
-class UncrumpledWindow(Screen, Style, Responses, Requests, Keybinder):
+class UncrumpledWindow(KeyBinder, Screen, Style, Responses, Requests):
+    supported_bind_handlers = ('on_key_down',)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.window = Window
-        self.setup_keybind(self.window)
         self.hk = SystemHotkey(consumer=self.sys_hotkey_handler,
                                check_queue_interval=0.001)
+
         self.hk.register(['f7'], self.req_system_get) # JFT
         self.queue = queue.Queue()
         Clock.schedule_interval(lambda e: self.check_queue(), 0.01)
-        self.supported_bind_handlers = ('on_key_down',)
-        self.active_bind_handlers = []
-        self.active_binds = {} # {event_type: {hk [cb1, cb2]}]}
+
+
+    # Behavior inherited from KeyBinder
+    # def keyboard_on_key_down(self, *args):
+        # import pdb;pdb.set_trace()
+
 
     def check_queue(self):
         try:
@@ -134,7 +106,7 @@ class ToplevelApp(App):
         if self.unc_app.DEVELOPING:
             # Has some performance penalties
             self.ev.set_debug(True)
-        self.ev.mainloop()
+        self.ev.run()
 
     def build(self):
         root = MyScreenManager()
@@ -162,6 +134,9 @@ if __name__ == '__main__':
             Builder.load_file(path)
             root = MyScreenManager()
             Clock.schedule_once(lambda e: root.remove_loadscreen(), 4)
+            for screen in root.screens:
+                if screen.name == 'uncrumpled':
+                    break
             return root
 
     class TestAsync(TestSync):
@@ -169,7 +144,7 @@ if __name__ == '__main__':
             logging.basicConfig(level=logging.DEBUG)
             self.ev = KivyEventLoop(self)
             self.ev.set_debug(True)
-            self.ev.mainloop()
+            self.ev.run()
 
-    # TestSync().run()
-    TestAsync().start()
+    TestSync().run()
+    # TestAsync().start()

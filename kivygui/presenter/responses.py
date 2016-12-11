@@ -6,20 +6,31 @@
 '''
 import logging
 from pprint import pprint
-from functools import wraps
+import json
+
+
+def _run_bind(unc, callback_string):
+    def _():
+        import pdb;pdb.set_trace()
+        callback = callback_string.split('(')[0]
+        if hasattr(unc, '_unc_' + callback):
+            eval('unc._unc_' + callback_string)
+        # The callback must be meant for the core...
+        else:
+            eval('unc.req_' + callback_string)
+    return _
 
 
 class Responses():
     '''run the responses from uncrumpled'''
     def _unc_bind_add(self, hotkey, event_type, command, command_kwargs):
+        hotkey = json.loads(hotkey)
         assert event_type in self.supported_bind_handlers
-        # Setup the bind handler if first time
-        if event_type not in self.active_bind_handlers:
-            handler = 'self.handler_' + event_type
-            eval('self._keyboard.bind({}={})'.format(event_type, handler))
-            self.active_bind_handlers.append(event_type)
-        command_str = '{cmd}(**{kwargs})'.format(cmd=command, kwargs=command_kwargs)
-        self.active_binds.setdefault(event_type, {})[hotkey] = [command_str]
+        command_str = '{cmd}(**{kwargs})'.format(cmd=command,
+                                                 kwargs=command_kwargs)
+        # self.kb_bind((2,), lambda: print(2))
+        # self.kb_bind(('2',), lambda : print(1))
+        self.kb_bind(hotkey, _run_bind(self, command_str))
 
     def _unc_bind_remove(self, hotkey, event_type, command):
         import pdb;pdb.set_trace()
@@ -66,4 +77,6 @@ class Responses():
         # self.kivy_app.pf.set_active(profile)
 
     def _unc_system_gotten(self, system):
+        import json
+        system = json.loads(system)
         pprint(system)
