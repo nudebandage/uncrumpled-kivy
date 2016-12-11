@@ -28,10 +28,10 @@ def _hash_key(hotkey):
     # Order doesn't matter for modifiers, so we force an order here
     # control - shift - alt - win, and when we read back the modifers we spit them
     # out in the same value so our dictionary keys always match
+    new_hotkey = []
     if len(hotkey) < 3:
-        return tuple(hotkey)
+        new_hotkey = [x for x in hotkey]
     else:
-        new_hotkey = []
         for mod in hotkey[:-1]:
             if 'control' == mod:
                 new_hotkey.append(mod)
@@ -44,7 +44,7 @@ def _hash_key(hotkey):
         for mod in hotkey[:-1]:
             if 'super' == mod:
                 new_hotkey.append(mod)
-    new_hotkey.append(hotkey[-1])
+        new_hotkey.append(hotkey[-1])
     # Ensure consistent format for ints
     with suppress(ValueError):
         new_hotkey[-1] = int(hotkey[-1])
@@ -121,7 +121,10 @@ class KeyBinder(FocusBehavior):
         returns an id that can be used to unregister the function
         '''
         assert on_down
-        assert isinstance(hotkey, Iterable) and type(hotkey) not in (bytes, str)
+        try:
+            assert isinstance(hotkey, Iterable) and type(hotkey) not in (bytes, str)
+        except Exception:
+            import pdb;pdb.set_trace()
         if not mode:
             mode = self.kb_mode
         hk = _hash_key(hotkey)
