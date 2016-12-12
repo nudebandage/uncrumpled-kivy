@@ -7,6 +7,7 @@
 
 import logging
 import queue
+import json
 import os
 from contextlib import suppress
 
@@ -52,7 +53,6 @@ class UncrumpledWindow(KeyBinder, Screen, Style, Responses, Requests):
         self.hk.register(['f7'], self.req_system_get) # JFT
         self.queue = queue.Queue()
         Clock.schedule_interval(lambda e: self.check_queue(), 0.01)
-
 
     # Behavior inherited from KeyBinder
     # def keyboard_on_key_down(self, *args):
@@ -136,6 +136,7 @@ if __name__ == '__main__':
             Clock.schedule_once(lambda e: root.remove_loadscreen(), 4)
             for screen in root.screens:
                 if screen.name == 'uncrumpled':
+                    Clock.schedule_once(lambda e: screen.kb_bind(('3',), lambda : print(1)), 2)
                     break
             return root
 

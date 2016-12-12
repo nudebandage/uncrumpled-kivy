@@ -46,7 +46,7 @@ class SmartText(KeyBinder, TextInput):
         self.focus_previous.focus = True
 
 
-def _validate_on_create(name, profile, hotkey):
+def validate_on_create(name, profile, hotkey):
     if not name:
         return 'A name is required', 0
     elif not profile:
@@ -59,37 +59,49 @@ def _validate_on_create(name, profile, hotkey):
 def get_no_process(text):
     if not text:
         return 'Please set a value for Dynamic Note Creation', 0
-    elif 'new' in text:
-        no_process = 'new'
-    elif 'nothing' in text:
-        no_process = 'nothing'
+    elif 'write' in text:
+        no_process = 'write'
+    elif 'shelve' in text:
+        no_process = 'shelve'
     elif 'prompt' in text:
         no_process = 'prompt'
-    elif 'load' in text:
-        no_process = 'load'
+    elif 'read' in text:
+        no_process = 'read'
         raise NotImplementedError
-    elif 'specific' in text:
-        no_process = 'specific'
+    elif 'bookmark' in text:
+        no_process = 'bookmark'
     else:
         return 'Invalid value for no process', 0
     return no_process, 1
 
+def get_widget(layout, name:str):
+    for widg in layout.children:
+        if name == widg.id:
+            return widg
+
 
 def on_create(unc, layout, widget):
-    name = layout.name.text
-    profile = layout.profile.text
-    hotkey = layout.hotkey.get()
+    name = get_widget(layout, 'name').text
+    profile = get_widget(layout, 'profile').text
+    hotkey = [x for x in get_widget(layout, 'hotkey').text.split(' ')]
     msg, code = validate_on_create(name, profile, hotkey)
     if not code:
         unc._unc_status_update(msg, code)
-    no_process, code = get_new_process(layout.no_process.text)
-    if not code:
-        unc._unc_status_update(no_process, code)
-
+        return
+    # TODO - add the no process widget
+    # no_process = get_widget(layout, 'no_process').text
+    # msg, code = get_no_process(no_process)
+    # if not code:
+        # unc._unc_status_update(no_process, code)
+        # return
+    # The no process value has been transformed
+    # else:
+        # no_process = msg
+    no_process = 'write'
     options = {'no_process':no_process}
 
-    unc._unc_create_book(profile, name, hotkey,
-                         unc.active_profile, **options)
+    unc.req_book_create(profile, name, hotkey,
+                        unc.active_profile, **options)
 
 
 def workbook_create(unc):
@@ -119,8 +131,8 @@ def workbook_create(unc):
     layout.add_widget(hotkey)
     layout.add_widget(Label(text='Profile', **label_args))
     layout.add_widget(profile)
-    # create = Button(text='Create', on_press=lambda x: on_create(unc, layout, x), **label_args)
-    create = Button(text='Create', on_press=lambda x: print('nice'), **label_args)
+    create = Button(text='Create', on_press=lambda x, layout=layout, unc=unc: on_create(unc, layout, x), **label_args)
+    # create = Button(text='Create', on_press=lambda x: print('nice'), **label_args)
     layout.add_widget(create)
 
     layout.first_focusable = lambda: name

@@ -11,7 +11,6 @@ import json
 
 def _run_bind(unc, callback_string):
     def _():
-        import pdb;pdb.set_trace()
         callback = callback_string.split('(')[0]
         if hasattr(unc, '_unc_' + callback):
             eval('unc._unc_' + callback_string)
@@ -28,8 +27,6 @@ class Responses():
         assert event_type in self.supported_bind_handlers
         command_str = '{cmd}(**{kwargs})'.format(cmd=command,
                                                  kwargs=command_kwargs)
-        # self.kb_bind((2,), lambda: print(2))
-        # self.kb_bind(('2',), lambda : print(1))
         self.kb_bind(hotkey, _run_bind(self, command_str))
 
     def _unc_bind_remove(self, hotkey, event_type, command):
@@ -45,7 +42,7 @@ class Responses():
         self.ids.commandpane.toggle()
 
     def _unc_status_update(self, msg, code):
-        self.ids.statusbar.unc_update_status(msg, code)
+        self.ids.statusbar.update_status(msg, code)
 
     def _unc_window_show(self):
         logging.info('unc_window_show')

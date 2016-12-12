@@ -4,6 +4,7 @@
     Kivy async support is pretty new so i cannot use the asyncio.coroutine etc
 '''
 import logging
+import json
 
 from uncrumpled.presenter import requests
 
@@ -37,6 +38,10 @@ class Requests():
         self.async_request('ui_init')
 
     def req_book_create(self, profile, book, hotkey, active_profile, **kwargs):
+        try:
+            assert(type(hotkey) == list)
+        except AssertionError:
+            import pdb;pdb.set_trace()
         self.async_request('book_create', profile=profile,
                                           book=book,
                                           hotkey=hotkey,

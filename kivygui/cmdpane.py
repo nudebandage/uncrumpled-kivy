@@ -140,17 +140,17 @@ class SearchBox(KeyBinder, TextInput):
             self.app.unc.req_cmdpane_item_open(heading)
 
 class TimsBuilder():
-    def __init__(self, clean: Callable, path: str):
+    def __init__(self, clean: Callable):
         self.clean = clean
-        self.path = path
 
-    def get(self, ui: str, element: str):
+    def get(self, unc, ui: str, element: str):
         ''' get a ui and build it '''
         # Clean anything
         self.clean()
         # Import some element somehow
         builder_function = getattr(elements, ui)
-        kivy_obj = builder_function(self.app.unc)
+        # kivy_obj = builder_function(self.app.unc)
+        kivy_obj = builder_function(unc)
         return kivy_obj
 
     def screen_exists(self, manager, element: str) -> bool:
@@ -189,7 +189,7 @@ class CommandPane(FloatLayout, Style):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.tb = TimsBuilder(clean=self._clear_list, path = 'cmdpane')
+        self.tb = TimsBuilder(clean=self._clear_list)
 
     def toggle(self):
         '''
@@ -227,7 +227,7 @@ class CommandPane(FloatLayout, Style):
 
     def ui_build(self, ui):
         ''' get a ui and build it '''
-        kivy_obj = self.tb.get(ui, ui)
+        kivy_obj = self.tb.get(self.app.unc, ui, ui)
         # Display an exisiting
         if self.tb.screen_exists(self.displayarea, ui):
             self.displayarea.current = ui

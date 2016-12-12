@@ -8,6 +8,7 @@ class StatusBar(BoxLayout, Style):
     def update_status(self, msg, code):
         self.ids.msg.text = msg
 
+
 class StatusBarApp(App):
     def build(self):
         return StatusBar()
