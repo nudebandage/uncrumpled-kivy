@@ -13,6 +13,7 @@ from contextlib import suppress
 
 from system_hotkey import SystemHotkey
 import peasoup
+from async_gui.toolkits.kivy import KivyEngine
 
 from kivy.app import App
 from kivy.base import KivyEventLoop
@@ -102,11 +103,14 @@ class ToplevelApp(App):
     def start(self, unc_app):
         '''call to start the gui (only used by the backend)'''
         self.unc_app = unc_app
-        self.ev = KivyEventLoop(self)
-        if self.unc_app.DEVELOPING:
+        self.engine = ''
+        # import pdb;pdb.set_trace()
+        self.run()
+        # self.ev = KivyEventLoop(self)
+        # if self.unc_app.DEVELOPING:
             # Has some performance penalties
-            self.ev.set_debug(True)
-        self.ev.run()
+            # self.ev.set_debug(True)
+        # self.ev.run()
 
     def build(self):
         root = MyScreenManager()
@@ -114,7 +118,7 @@ class ToplevelApp(App):
         # Find the widget handling our requests/responses and call ui_init
         for screen in root.screens:
             if screen.name == 'uncrumpled':
-                screen.ev = self.ev
+                screen.engine = self.engine
                 # Backend/Core
                 screen._unc_app = self.unc_app
                 # Main Uncrumpled Screen

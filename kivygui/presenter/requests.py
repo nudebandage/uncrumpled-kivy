@@ -6,13 +6,19 @@
 import logging
 import json
 
+from async_gui.toolkits.kivy import KivyEngine
+from async_gui.engine import Task
+
 from uncrumpled.presenter import requests
 
+engine = KivyEngine()
 
 class Requests():
     # Delegate the function from uncrumpled to self._unc_
+    @engine.async
     def async_request(self, func, **kwargs):
         def _(self, **kwargs):
+            return True
             print('request sent -> ', func)
             reqfunc = eval('requests.{}'.format(func))
             response = reqfunc(self._unc_app, **kwargs)
@@ -22,11 +28,16 @@ class Requests():
                         # import pdb;pdb.set_trace()
                     # if 'gotten' in resp_func:
                         # import pdb;pdb.set_trace()
-                    eval('self._unc_{}'.format(resp_func))
+                    yield eval('self._unc_{}'.format(resp_func))
                 except Exception as err: # JFT
                     logging.critical(resp_func+' '+ err)
-        self.ev.run_until_complete(
-                self.ev.run_in_executor(None, _, self, **kwargs))
+
+
+        import pdb;pdb.set_trace()
+        yield Task(_(self, **kwargs))
+        # self.ev.run_until_complete(
+                # self.ev.run_in_executor(None, _, self, **kwargs))
+
 
     def req_cmdpane_search(self, query):
         self.async_request('cmdpane_search', query=query)
