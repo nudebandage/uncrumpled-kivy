@@ -2,10 +2,13 @@ import logging
 import webbrowser
 
 from kivy.app import App
-from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 from kivy.properties import StringProperty
+
 from kivygui.rules import Style
+from kivygui.keybinder import KeyBinder
 
 _welcome='''
         [size=70][font=Inconsolata]uncrumpled[/font][/size]
@@ -38,25 +41,45 @@ class MultiLineLabel(Label):
     def on_text_changed(self, widget, text):
         self.on_size(self, self.size)
 
-
-class UncrumpledEditor(TabbedPanel):
+class UncrumpledEditor(KeyBinder, TabbedPanel):
     file = None
     gui = None
     # welcome_text = StringProperty(_welcome)
     # def open_link(link):
         # webbrowser.open(link)
+
     def unc_page_load(self, file):
         # TODO FOCUS WINDOW, SEEK 0, 0
         logging.info('unc_page_load '+ file)
         self.file = file
-        self.gui = self.content.children[0]
+        # self.gui = self.content.children[0]
+        page = Page()
+        # TODO plug system
+        # page.kb_bind(('ctrl', 'spacebar'), self.app.unc._unc_cmdpane_toggle)
         with open(file, 'r') as f:
-            self.gui.text = f.read()
+            page.text = f.read()
+        self.add_widget(page)
 
     def unc_page_close(self, file):
         logging.info('unc_page_close '+ file)
         with open(file, 'w') as f:
             f.write(self.gui.text)
+
+
+class Page(TextInput):
+    pass
+    # def keyboard_on_key_down(self, _, keycode, *args):
+        # k = self.interesting_keys.get(keycode[0])
+        # Let binds be handled by plugins above #TODO
+        # if k:
+            # super().keyboard_on_key_down(_, keycode, *args)
+            # Consume
+            # return True
+
+        # Let editor handle as normal insert
+        # return False
+
+
 
 
 class EditorApp(App):

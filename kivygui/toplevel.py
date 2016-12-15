@@ -37,6 +37,9 @@ from kivygui.keybinder import KeyBinder
 
 
 class MyScreenManager(ScreenManager):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def remove_loadscreen(self):
         self.transition = FadeTransition()
         self.current = self.current = 'uncrumpled'
@@ -53,11 +56,6 @@ class UncrumpledWindow(KeyBinder, Screen, Style, Responses, Requests):
         self.hk.register(['f7'], self.req_system_get) # JFT
         self.queue = queue.Queue()
         Clock.schedule_interval(lambda e: self.check_queue(), 0.01)
-
-    # Behavior inherited from KeyBinder
-    # def keyboard_on_key_down(self, *args):
-        # import pdb;pdb.set_trace()
-
 
     def check_queue(self):
         try:

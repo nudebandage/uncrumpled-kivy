@@ -201,7 +201,6 @@ class CommandPane(KeyBinder, FloatLayout, Style):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tb = TimsBuilder(clean=self._clear_list)
-        self.kb_bind(('1',), lambda *e: print(1))
 
         Clock.schedule_once(lambda e: self.setup_binds(), 1)
 
@@ -210,18 +209,17 @@ class CommandPane(KeyBinder, FloatLayout, Style):
         self.searchbox.kb_bind(('escape',), self.toggle)
         self.searchbox.kb_bind(('ctrl', 'spacebar'), self.toggle)
 
-    # def keyboard_on_key_down(self, *args):
-        # import pdb;pdb.set_trace()
-
     def toggle(self):
         '''
         toggle the cmd pane open or close
         '''
         if self.visible:
             self.visible = False
+            self.parent.focus = True
         else:
             self.visible = True
             self.searchbox.focus = True
+
         # Consume the event
         return True
 
