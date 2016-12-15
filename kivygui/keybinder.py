@@ -51,16 +51,35 @@ def _hash_key(hotkey):
     return tuple(new_hotkey)
 
 
-class KeyBinder(FocusBehavior):
+class FocusMixin():
+    def kb_focus_next(self):
+        '''Returns True if we could change focus'''
+        try:
+            self.focus_next.focus = True
+            return True
+        except AttributeError:
+            # Let someone else handle the event
+            return False
+
+    def kb_focus_previous(self):
+        '''Returns True if we could change focus'''
+        try:
+            self.focus_previous.focus = True
+            return True
+        except AttributeError:
+            # Let someone else handle the event
+            return False
+
+
+
+class KeyBinder(FocusBehavior, FocusMixin):
     '''
     Keybind a little more sanely in Kivy
     '''
 
     def __init__(self, kb_mode=None, **kwargs):
         '''
-        mode: see key_bind()
-        target: instance of a  that should be focused for
-                the keybindings to work, defaults to self
+        kb_mode: see key_bind()
         '''
         # {mode: {key: [functions]}}
         super().__init__(**kwargs)
@@ -69,17 +88,18 @@ class KeyBinder(FocusBehavior):
         self.kb_mode = kb_mode
 
     def run_down_funcs(self, mode, hk):
-        # will fail alot so we look before we leap instead of error handling
+        consumed = False
         try:
             if hk in self._keybinds_down[mode]:
                 for func in self._keybinds_down[mode][hk]:
-                    func()
+                    if func():
+                        consumed = True
             else:
                 return False
         except KeyError:
             return False
         else:
-            return True
+            return consumed
 
     def kb_set_mode(self, mode=None):
         '''
@@ -94,22 +114,16 @@ class KeyBinder(FocusBehavior):
 
     # This function is called because we have the FocusBehavior
     def keyboard_on_key_down(self, _, keycode, keychar, modifiers):
-        try:
-            keysym = keycode[1]
-            hk = _hash_key((*modifiers, keysym))
-            ret = self.run_down_funcs(self.kb_mode, hk)
-
-            if not ret:
-                # Key consumed
-                if super().keyboard_on_key_down(_, keycode, keychar, modifiers):
-                    return True
-                else:
-                    return False
-            return True
-        except Exception as err:
-            abc = err
-            pass
-            import pdb;pdb.set_trace()
+        keysym = keycode[1]
+        hk = _hash_key((*modifiers, keysym))
+        consumed = self.run_down_funcs(self.kb_mode, hk)
+        if not consumed:
+            # Key consumed
+            if super().keyboard_on_key_down(_, keycode, keychar, modifiers):
+                return True
+            else:
+                return False
+        return True
 
     def kb_bind(self, hotkey, on_down=None, mode=None) -> int:
         '''
@@ -119,6 +133,9 @@ class KeyBinder(FocusBehavior):
         can be added per call to this function.
 
         returns an id that can be used to unregister the function
+
+        The event will be propergated higher up unless one of the callbacks
+        for the bind returns True
         '''
         assert on_down
         try:
@@ -173,7 +190,7 @@ if __name__ == '__main__':
             grid = GridLayout(cols=4)
             for i in range(40):
                 btn = FocusButton(text=str(i))
-                btn.kb_bind(('escape',), on_down=lambda: print('esc'))
+                btn.kb_bind(('ctrl', 'spacebar'), on_down=lambda: print('esc'))
                 # btn.kb_bind((i,), on_down=lambda i=i:print('cb 1 ',i))
                 # btn.kb_bind((i,), on_down=lambda i=i:print('cb 2 ', i*2))
                 grid.add_widget(btn)
