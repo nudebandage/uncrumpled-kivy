@@ -2,7 +2,7 @@ import logging
 import webbrowser
 
 from kivy.app import App
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.properties import StringProperty
@@ -41,7 +41,7 @@ class MultiLineLabel(Label):
     def on_text_changed(self, widget, text):
         self.on_size(self, self.size)
 
-class UncrumpledEditor(KeyBinder, TabbedPanel):
+class UncrumpledEditor(TabbedPanel):
     file = None
     gui = None
     # welcome_text = StringProperty(_welcome)
@@ -52,12 +52,14 @@ class UncrumpledEditor(KeyBinder, TabbedPanel):
         # TODO FOCUS WINDOW, SEEK 0, 0
         logging.info('unc_page_load '+ file)
         self.file = file
-        # self.gui = self.content.children[0]
         page = Page()
         # TODO plug system
-        # page.kb_bind(('ctrl', 'spacebar'), self.app.unc._unc_cmdpane_toggle)
+        page.kb_bind(('ctrl', 'spacebar'), self.app.unc._unc_cmdpane_toggle)
         with open(file, 'r') as f:
             page.text = f.read()
+
+        # th = TabbedPanelHeader()
+        # th.content = page
         self.add_widget(page)
 
     def unc_page_close(self, file):
@@ -65,9 +67,15 @@ class UncrumpledEditor(KeyBinder, TabbedPanel):
         with open(file, 'w') as f:
             f.write(self.gui.text)
 
+    def focus_current(self):
+        # TODO
+        self.content.children[0].focus = True
 
-class Page(TextInput):
+
+class Page(KeyBinder, TextInput):
     pass
+    # def __init__(self, **kwargs):
+        # super().__init__(**kwargs)
     # def keyboard_on_key_down(self, _, keycode, *args):
         # k = self.interesting_keys.get(keycode[0])
         # Let binds be handled by plugins above #TODO

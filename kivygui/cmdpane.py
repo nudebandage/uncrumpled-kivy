@@ -215,7 +215,7 @@ class CommandPane(KeyBinder, FloatLayout, Style):
         '''
         if self.visible:
             self.visible = False
-            self.parent.focus = True
+            self.parent.ids.editor.focus_current()
         else:
             self.visible = True
             self.searchbox.focus = True
