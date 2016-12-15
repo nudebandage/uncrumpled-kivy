@@ -34,7 +34,7 @@
     rvscreen: rvscreen
     RVScreen:
         id: rvscreen
-        name: 'recycleview_screen'
+        name: 'searchitems'
 
 <CommandPane>:
     id: cmdpane
@@ -55,6 +55,7 @@
     SearchBox:
         id: searchbox
         app: app
+        displayarea: displayarea
         recycleview: displayarea.rvscreen.recycleview
         multiline: False
         on_text: root.search()

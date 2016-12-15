@@ -4,6 +4,7 @@ from typing import Callable
 from contextlib import suppress
 
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.behaviors import FocusBehavior
 from kivy.properties import BooleanProperty
 from kivy.uix.anchorlayout import AnchorLayout
@@ -22,7 +23,10 @@ from kivygui.rules import Style
 from kivygui.keybinder import KeyBinder
 import kivygui.cmdpane_elements as elements
 
-class DisplayArea(ScreenManager): pass
+class DisplayArea(ScreenManager):
+    def goto_homepage(self):
+        self.current = self.rvscreen.name
+
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
                                  RecycleBoxLayout):
@@ -35,6 +39,7 @@ class SelectableLabel(RecycleDataViewBehavior, Label):
     selected = BooleanProperty(False)
     selectable = BooleanProperty(True)
 
+    # TODO Tab switching between the searchitems..
     # def __init__(self, **kwargs):
         # super().__init__(**kwargs)
         # self.kb_bind(('tab',), self.tab_pressed)
@@ -60,7 +65,7 @@ class SelectableLabel(RecycleDataViewBehavior, Label):
             return True
         if self.collide_point(*touch.pos) and self.selectable:
             # Focus searchbox on touch
-            self._proxy_ref.parent.parent.searchbox.focus = True
+            self._proxy_ref.parent.parent.parent.parent.parent.searchbox.focus = True
             return self.parent.select_with_touch(self.index, touch)
 
     def apply_selection(self, rv, node, is_selected):
@@ -82,11 +87,17 @@ class SearchBox(KeyBinder, TextInput):
         self.kb_bind(('tab',), self.tab_pressed)
         self.kb_bind(('shift', 'tab',), self.shift_tab_pressed)
 
+        #TODO on click focus the item
+
     def tab_pressed(self):
-        self.focus_next.focus = True
+        self.kb_focus_next()
+        # Always consume the event
+        return True
 
     def shift_tab_pressed(self):
-        self.focus_previous.focus = True
+        self.kb_focus_previous()
+        # Always consume the event
+        return True
 
     def go_down(self):
         self.set_active(1)
@@ -124,7 +135,7 @@ class SearchBox(KeyBinder, TextInput):
                 new_pos = max_index
 
         rv.layout_manager.select_node(new_pos)
-        self.displayarea.current = 'recycleview'
+        self.displayarea.goto_homepage()
 
     def item_select_init(self):
         ''' Initalize selection to first item if nothing selected '''
@@ -153,11 +164,11 @@ class TimsBuilder():
         kivy_obj = builder_function(unc)
         return kivy_obj
 
-    def screen_exists(self, manager, element: str) -> bool:
-        '''tells us if a screen already exists in the screenmanager'''
+    def screen_get(self, manager, element: str):
+        '''get an existing screen given its name, or None'''
         for screen in manager.screens:
             if screen.name == element:
-                return True
+                return screen
         return False
 
     def screen_make(self, manager, kivy_obj, name: str):
@@ -184,12 +195,23 @@ class TimsBuilder():
         return screen
 
 
-class CommandPane(FloatLayout, Style):
+class CommandPane(KeyBinder, FloatLayout, Style):
     visible = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tb = TimsBuilder(clean=self._clear_list)
+        self.kb_bind(('1',), lambda *e: print(1))
+
+        Clock.schedule_once(lambda e: self.setup_binds(), 1)
+
+    def setup_binds(self):
+        # TODO plug system
+        self.searchbox.kb_bind(('escape',), self.toggle)
+        self.searchbox.kb_bind(('ctrl', 'spacebar'), self.toggle)
+
+    # def keyboard_on_key_down(self, *args):
+        # import pdb;pdb.set_trace()
 
     def toggle(self):
         '''
@@ -200,6 +222,8 @@ class CommandPane(FloatLayout, Style):
         else:
             self.visible = True
             self.searchbox.focus = True
+        # Consume the event
+        return True
 
     # @rate_limited(1) TODO this is already fucking up because of async.... wait till async is not bugging..
 
@@ -215,7 +239,7 @@ class CommandPane(FloatLayout, Style):
             print('doing search request')
             self.app.unc.req_cmdpane_search(query)
             self.searchbox.item_select_init()
-            self.displayarea.current = 'recycleview_screen'
+            self.displayarea.goto_homepage()
 
     def display_search_results(self, headings, bodies):
         bodies = map(lambda x: x if x else '', bodies)
@@ -228,13 +252,15 @@ class CommandPane(FloatLayout, Style):
     def ui_build(self, ui):
         ''' get a ui and build it '''
         kivy_obj = self.tb.get(self.app.unc, ui, ui)
+        screen = self.tb.screen_get(self.displayarea, ui)
+
+        # Create a New Screen
+        if not screen:
+            screen = self.tb.screen_make(self.displayarea, kivy_obj, ui)
         # Display an exisiting
-        if self.tb.screen_exists(self.displayarea, ui):
+        else:
             self.displayarea.current = ui
             kivy_obj.clear_values()
-        # Create a New Screen
-        else:
-            screen = self.tb.screen_make(self.displayarea, kivy_obj, ui)
 
         self.displayarea.current = ui
 
