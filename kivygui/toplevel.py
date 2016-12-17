@@ -15,7 +15,6 @@ from system_hotkey import SystemHotkey
 import peasoup
 
 from kivy.app import App
-from kivy.base import KivyEventLoop
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -135,7 +134,6 @@ if __name__ == '__main__':
     class TestAsync(TestSync):
         def start(self):
             logging.basicConfig(level=logging.DEBUG)
-            self.ev = KivyEventLoop(self)
             self.ev.set_debug(True)
             self.ev.run()
 
