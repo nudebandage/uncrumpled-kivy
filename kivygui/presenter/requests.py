@@ -5,7 +5,9 @@
 '''
 import logging
 import json
+import time
 
+from kivy.clock import Clock
 from async_gui.toolkits.kivy import KivyEngine
 from async_gui.engine import Task
 
@@ -27,9 +29,10 @@ class Requests():
                 logging.exception(resp_func+' '+ err)
                 raise
 
-    @engine.async
+    # @engine.async
     def async_request(self, func, **kwargs):
-        yield Task(lambda: self.do(func, **kwargs))
+        # yield Task(lambda: self.do(func, **kwargs))
+        Clock.schedule_once(lambda e: self.do(func, **kwargs), 0)
 
     def req_cmdpane_search(self, query):
         self.async_request('cmdpane_search', query=query)
@@ -59,3 +62,8 @@ class Requests():
                                              hotkey=hotkey)
     def req_system_get(self):
         self.async_request('system_get')
+
+    def req_page_settings_view(self, file=None):
+        if not file:
+            file = self.ids.editor.current_file()
+        self.async_request('page_settings_view', file=file)

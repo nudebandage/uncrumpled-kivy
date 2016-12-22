@@ -190,7 +190,7 @@ if __name__ == '__main__':
             grid = GridLayout(cols=4)
             for i in range(40):
                 btn = FocusButton(text=str(i))
-                btn.kb_bind(('ctrl', 'spacebar'), on_down=lambda: print('esc'))
+                btn.kb_bind(('ctrl', 'alt', 'p'), on_down=lambda: print('esc'))
                 # btn.kb_bind((i,), on_down=lambda i=i:print('cb 1 ',i))
                 # btn.kb_bind((i,), on_down=lambda i=i:print('cb 2 ', i*2))
                 grid.add_widget(btn)

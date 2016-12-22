@@ -11,12 +11,19 @@ import json
 
 def _run_bind(unc, callback_string):
     def _():
+        ''' The order of checking is important '''
+        # TODO plugin architecture..
+        # The problem arises when bind req and resp have the same name
+        # - Not all response handlers should be callable...
+        # - cmdpane_toggle should be but some others not...
+        # - find a solution that reducers complexity
         callback = callback_string.split('(')[0]
-        if hasattr(unc, '_unc_' + callback):
-            eval('unc._unc_' + callback_string)
         # The callback must be meant for the core...
-        else:
+        if hasattr(unc, 'req_' + callback):
             eval('unc.req_' + callback_string)
+        # Nope was meant as a response
+        else:
+            eval('unc._unc_' + callback_string)
     return _
 
 
@@ -77,3 +84,10 @@ class Responses():
         import json
         system = json.loads(system)
         pprint(system)
+
+    # Careful this has the same name as the request, see _run_bind
+    def _unc_page_settings_view(self, settings):
+        self.ids.editor.unc_page_settings_view(settings)
+
+    def _unc_api_error(self, msg, **kwargs):
+        import pdb;pdb.set_trace()
