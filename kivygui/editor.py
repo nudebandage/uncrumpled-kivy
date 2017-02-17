@@ -1,3 +1,4 @@
+# TODO signal_defocus needs to be called from select_tab
 import logging
 import io
 from pprint import pformat
@@ -6,10 +7,11 @@ import json
 from collections import defaultdict
 
 from kivy.app import App
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader, TabbedPanelItem
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.properties import StringProperty
+from kivy.clock import Clock
 
 from kivygui.keybinder import KeyBinder
 
@@ -46,55 +48,132 @@ class MultiLineLabel(Label):
 
 
 class UncrumpledEditor(TabbedPanel):
-    file = None # type: str
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self.pageref = {}
+
+    # file = None # type: str
     # welcome_text = StringProperty(_welcome)
     # def open_link(link):
         # webbrowser.open(link)
-
+    # def on_touch_down(self, touch):
+        # if super().on_touch_down(touch):
+            # print('true')
+            # return True
+        # Select the widget..
+        # else:
+            # self.get_current().focus = True
+            # return True
 
     def unc_page_load(self, file):
-        # TODO FOCUS WINDOW, SEEK 0, 0
         logging.info('unc_page_load '+ file)
-        page = Page()
-        page.file = file
-        # TODO plug system
-        page.kb_bind(('ctrl', 'spacebar'), self.app.unc._unc_cmdpane_toggle)
-        with open(file, 'r') as f:
-            page.text = f.read()
-
-        th = TabbedPanelHeader()
-        th.content = page
-        self.add_widget(page)
+        tab_id = self.pageref.get(file)
+        if tab_id == None:
+            page = Page(self, file)
+        else:
+            page = tab_id.content
+        self.do_load(page, tab_id)
 
     def unc_page_close(self, file):
+        '''
+        Close the tab containing the file
+        '''
         logging.info('unc_page_close '+ file)
-        with open(file, 'w') as f:
-            f.write(self.get_current().text)
+
+        widget = self.pageref.get(file).content
+
+        # Save and what not
+        widget.on_remove()
+
+        # Remove the tab
+        tab = self.pageref.pop(file)
+        self.remove_widget(tab)
+
+    def do_load(self, widget, tab):
+        '''
+        open a tab and load the file
+        alternativley switch to the tab if the file is already open
+        '''
+        # Create a new tab
+        if not tab:
+            widget.on_load()
+            # TODO plug system
+            widget.kb_bind(('ctrl', 'spacebar'), self.app.unc._unc_cmdpane_toggle)
+
+            self.insert_widget(widget)
+
+            widget.on_tab_change()
+
+            tab = self.tab_list[0]
+            self.switch_to(tab)
+
+            widget.add_tab_id(tab)
+        # Swith to existing tab
+        else:
+            self.switch_to(tab)
+            widget.on_tab_change()
 
     def unc_page_settings_view(self, settings):
         logging.info('unc_page_settings_view')
-        page = SettingsViewer()
-        # TODO plug system
-        page.kb_bind(('ctrl', 'spacebar'), self.app.unc._unc_cmdpane_toggle)
-        self.add_widget(page)
-        page.insert_text(settings)
+        tab = self.pageref.get('settings_viewer')
+        if tab == None:
+            page = SettingsViewer(settings)
+        else:
+            page = tab.content
+        self.do_load(page, tab)
 
-    def get_current(self):
-        return self.content.children[0]
+    def insert_widget(self, widget):
+        th = TabbedPanelHeader()
+        th.text = str(len(self.tab_list))
+        th.content = widget
+        widget.on_insert(th)
+        self.add_widget(th)
+
+    def page_settings_closed(self):
+        import pdb;pdb.set_trace()
+        del self.pageref['settings_viewer']
+        # TODO BIND ON_DELETE TO CALL THIS
+
+    def get_active_widget(self):
+        return self.current_tab.content
 
     def focus_current(self):
-        # TODO
-        self.content.children[0].focus = True
+        self.get_active_widget().focus = True
 
     def current_file(self):
-        return self.content.children[0].file
+        return self.get_active_widget().file
 
 
+class EmbedInEditor(KeyBinder, TextInput):
+    def __init__(self, tabbedpanel, data, **kwargs):
+        super().__init__(**kwargs)
+        self.tp = tabbedpanel
+        self.data = data
 
-class Page(KeyBinder, TextInput):
-    pass
-    # def __init__(self, **kwargs):
-        # super().__init__(**kwargs)
+
+class Page(EmbedInEditor):
+    def on_remove(self):
+        # Save
+        with open(self.data, 'w') as f:
+            f.write(self.text)
+
+    def on_load(self):
+        with open(self.data, 'r') as f:
+            self.text = f.read()
+
+    def on_tab_change(self):
+        ''' we let uncrumpled know a window has lost focus'''
+        if self.tp.tab_list and len(self.tp.tab_list) > 1:
+            file = self.tp.current_tab.uncrumpled_file
+            self.tp.app.unc.req_page_deactivate(file)
+
+    def on_insert(self, tab):
+        # add a backlink
+        tab.uncrumpled_file = self.data
+
+    def add_tab_id(self, tab):
+        self.tp.pageref[self.data] = tab
+
     # def keyboard_on_key_down(self, _, keycode, *args):
         # k = self.interesting_keys.get(keycode[0])
         # Let binds be handled by plugins above #TODO
@@ -106,11 +185,10 @@ class Page(KeyBinder, TextInput):
         # Let editor handle as normal insert
         # return False
 
-class SettingsViewer(KeyBinder, TextInput):
-    # TODO running this function crashes randomly when run async..
-    def insert_text(self, settings:dict):
+class SettingsViewer(EmbedInEditor):
+    def on_load(self):
         groups = defaultdict(list)
-        for title, attrs in settings.items():
+        for title, attrs in self.data.items():
             lines = groups[title]
             lines.append('_____________')
             # Order the individual settings in a group
@@ -142,6 +220,14 @@ class SettingsViewer(KeyBinder, TextInput):
 
         self.text = '\n'.join(flat)
 
+    def on_tab_change(self):
+        pass
+
+    def on_insert(self):
+        pass
+
+    def add_tab_id(self, tab):
+        self.tp.pageref['settings_viewer'] = tab
 
 class EditorApp(App):
     def build(self):

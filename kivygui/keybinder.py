@@ -32,6 +32,7 @@ def _hash_key(hotkey):
     if len(hotkey) < 3:
         new_hotkey = [x for x in hotkey]
     else:
+        # TODO these modifiers strings are wrong...
         for mod in hotkey[:-1]:
             if 'control' == mod:
                 new_hotkey.append(mod)

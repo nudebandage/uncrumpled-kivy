@@ -9,7 +9,7 @@ import time
 
 from kivy.clock import Clock
 from async_gui.toolkits.kivy import KivyEngine
-from async_gui.engine import Task
+from async_gui.engine import Task, ProcessTask
 
 from uncrumpled.presenter import requests
 
@@ -26,13 +26,13 @@ class Requests():
             try:
                 eval('self._unc_{}'.format(resp_func))
             except Exception as err: # JFT
-                logging.exception(resp_func+' '+ err)
+                logging.exception(err)
                 raise
 
-    # @engine.async
+    @engine.async
     def async_request(self, func, **kwargs):
-        # yield Task(lambda: self.do(func, **kwargs))
-        Clock.schedule_once(lambda e: self.do(func, **kwargs), 0)
+        yield Task(self.do,func, **kwargs)
+        # Clock.schedule_once(lambda e: self.do(func, **kwargs), 0)
 
     def req_cmdpane_search(self, query):
         self.async_request('cmdpane_search', query=query)
@@ -67,3 +67,6 @@ class Requests():
         if not file:
             file = self.ids.editor.current_file()
         self.async_request('page_settings_view', file=file)
+
+    def req_page_deactivate(self, file):
+        self.async_request('page_deactivate', file=file)
