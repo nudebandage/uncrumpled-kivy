@@ -5,8 +5,12 @@
     e.g bind_add
 '''
 import logging
-from pprint import pprint
 import json
+from pprint import pprint
+import sys
+from contextlib import suppress
+
+from peasoup import pidutil
 
 
 def _run_bind(unc, callback_string):
@@ -54,10 +58,15 @@ class Responses():
     def _unc_window_show(self):
         logging.info('unc_window_show')
         self.window.show()
+        if 'linux' in sys.platform:
+            with suppress(AttributeError):
+                pidutil.move_active_window(*self._last_dims)
 
     def _unc_window_hide(self): #TODO
         '''hide the window, also tell uncrumpled all the pages we closed'''
         logging.info('unc_window_hide')
+        if 'linux' in sys.platform:
+            self._last_dims = pidutil.get_active_window_pos()
         self.window.hide()
 
     def _unc_welcome_screen(self):
