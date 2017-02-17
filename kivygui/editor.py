@@ -158,8 +158,15 @@ class Page(EmbedInEditor):
             f.write(self.text)
 
     def on_load(self):
+        def set_text(data):
+            self.text = data
+
         with open(self.data, 'r') as f:
-            self.text = f.read()
+            data = f.read()
+            # Errors out sometimes without schedule_once...
+            # This means we require a delay on hotkey presses otherwise
+            # a dirty state could be picked up and saved inbetween
+            Clock.schedule_once(lambda _: set_text(data))
 
     def on_tab_change(self):
         ''' we let uncrumpled know a window has lost focus'''
@@ -221,6 +228,8 @@ class SettingsViewer(EmbedInEditor):
         self.text = '\n'.join(flat)
 
     def on_tab_change(self):
+        print('on tab change')
+        import pdb;pdb.set_trace()
         pass
 
     def on_insert(self):

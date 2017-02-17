@@ -10,6 +10,7 @@ import time
 from kivy.clock import Clock
 from async_gui.toolkits.kivy import KivyEngine
 from async_gui.engine import Task, ProcessTask
+from timstools import rate_limited
 
 from uncrumpled.presenter import requests
 
@@ -57,6 +58,7 @@ class Requests():
     def req_profile_create(self, profile):
         self.async_request('profile_create', profile=profile,)
 
+    @rate_limited(8, mode='kill')
     def req_hotkey_pressed(self, profile, program, hotkey):
         self.async_request('hotkey_pressed', profile=profile, program=program,
                                              hotkey=hotkey)
