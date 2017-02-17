@@ -68,6 +68,12 @@ class Requests():
     def req_page_settings_view(self, file=None):
         if not file:
             file = self.ids.editor.current_file()
+            # TODO fix this hack, bug waiting to happen
+            assert type(file) == dict
+            # Settings file detected
+            # TODO, save and close it
+            # self.ids.editor.
+
         self.async_request('page_settings_view', file=file)
 
     def req_page_deactivate(self, file):

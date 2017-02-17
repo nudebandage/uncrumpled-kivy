@@ -1,4 +1,18 @@
+# TODO refactor this shit
 # TODO signal_defocus needs to be called from select_tab
+
+'''
+TODO
+
+Uncrumpeld Settings should be able to be dependant on the
+same rules for our note settings.
+
+Settings files are just files with a setting extension.
+Default behavior is coded in vim?
+What does this mean for Non text settings viewers?
+The plus is that the settings are customizable from text
+and we have all the power that comes with that
+'''
 import logging
 import io
 from pprint import pformat
@@ -73,6 +87,7 @@ class UncrumpledEditor(TabbedPanel):
         else:
             page = tab_id.content
         self.do_load(page, tab_id)
+        self.focus_current()
 
     def unc_page_close(self, file):
         '''
@@ -115,12 +130,21 @@ class UncrumpledEditor(TabbedPanel):
 
     def unc_page_settings_view(self, settings):
         logging.info('unc_page_settings_view')
-        tab = self.pageref.get('settings_viewer')
+        file = settings['UFile']
+        tab_id = file + 'settings_viewer'
+        tab = self.pageref.get(tab_id)
         if tab == None:
-            page = SettingsViewer(settings)
+            page = SettingsViewer(self, settings)
         else:
             page = tab.content
         self.do_load(page, tab)
+        # TODO this should be called from backend
+        self.focus_current()
+
+    def page_settings_close(self, data):
+        '''
+        Close a settings file
+        '''
 
     def insert_widget(self, widget):
         th = TabbedPanelHeader()
@@ -129,10 +153,9 @@ class UncrumpledEditor(TabbedPanel):
         widget.on_insert(th)
         self.add_widget(th)
 
-    def page_settings_closed(self):
-        import pdb;pdb.set_trace()
-        del self.pageref['settings_viewer']
+    def on_page_settings_closed(self):
         # TODO BIND ON_DELETE TO CALL THIS
+        del self.pageref['settings_viewer']
 
     def get_active_widget(self):
         return self.current_tab.content
@@ -141,7 +164,7 @@ class UncrumpledEditor(TabbedPanel):
         self.get_active_widget().focus = True
 
     def current_file(self):
-        return self.get_active_widget().file
+        return self.get_active_widget().data
 
 
 class EmbedInEditor(KeyBinder, TextInput):
@@ -194,6 +217,7 @@ class Page(EmbedInEditor):
 
 class SettingsViewer(EmbedInEditor):
     def on_load(self):
+        # TODO see Clock and rate limiting  for Page.on_load
         groups = defaultdict(list)
         for title, attrs in self.data.items():
             lines = groups[title]
@@ -228,11 +252,18 @@ class SettingsViewer(EmbedInEditor):
         self.text = '\n'.join(flat)
 
     def on_tab_change(self):
-        print('on tab change')
-        import pdb;pdb.set_trace()
+        ''' Automatically saves and sources the files,
+        TODO We should probably hook into vims autocomands???
+        Texteditor type tihings like settings viewers
+        could be programmed as vim plugins...'''
+        # uncrumpled backend should know if ANY file is open, allows customizable behavior, first make sure we have some use cases
+        # print('on tab change')
+        # import pdb;pdb.set_trace()
         pass
 
-    def on_insert(self):
+    def on_insert(self, tab):
+        # add a backlink
+        tab.uncrumpled_file = 'settings_viewer'
         pass
 
     def add_tab_id(self, tab):

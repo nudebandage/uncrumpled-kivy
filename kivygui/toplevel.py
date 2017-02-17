@@ -97,7 +97,7 @@ class UncrumpledWindow(KeyBinder, Screen, Style, Responses, Requests):
 
 class ToplevelApp(App):
     def start(self, unc_app):
-        '''call to start the gui (only used by the backend)'''
+        '''start the gui (only used by the backend)'''
         self.unc_app = unc_app
         self.run()
 
