@@ -66,10 +66,12 @@ class Requests():
         self.async_request('system_get')
 
     def req_page_settings_view(self, file=None):
+        assert file==None
+        # Called by the user
         if not file:
             file = self.ids.editor.current_file()
             # TODO fix this hack, bug waiting to happen
-            assert type(file) == dict
+            # assert type(file) == dict
             # Settings file detected
             # TODO, save and close it
             # self.ids.editor.

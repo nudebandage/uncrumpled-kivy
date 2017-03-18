@@ -65,6 +65,7 @@ class UncrumpledEditor(TabbedPanel):
     def __init__(self, *a, **k):
         super().__init__(*a, **k)
         self.pageref = {}
+        self.settingsref = {}
 
     # file = None # type: str
     # welcome_text = StringProperty(_welcome)
@@ -129,6 +130,8 @@ class UncrumpledEditor(TabbedPanel):
             widget.on_tab_change()
 
     def unc_page_settings_view(self, settings):
+        ''' Switch to or pen a settings viewer '''
+        import pdb;pdb.set_trace()
         logging.info('unc_page_settings_view')
         file = settings['UFile']
         tab_id = file + 'settings_viewer'
@@ -145,6 +148,7 @@ class UncrumpledEditor(TabbedPanel):
         '''
         Close a settings file
         '''
+        import pdb;pdb.set_trace()
 
     def insert_widget(self, widget):
         th = TabbedPanelHeader()
@@ -158,10 +162,17 @@ class UncrumpledEditor(TabbedPanel):
         del self.pageref['settings_viewer']
 
     def get_active_widget(self):
+        '''return active widget or None if no widget in tab,
+        no widget currently happens on startup...'''
         return self.current_tab.content
 
     def focus_current(self):
-        self.get_active_widget().focus = True
+        widg = self.get_active_widget()
+        if widg:
+            widg.focus = True
+        # Focus the editor instead
+        else:
+            self.focus = True
 
     def current_file(self):
         return self.get_active_widget().data
@@ -216,6 +227,9 @@ class Page(EmbedInEditor):
         # return False
 
 class SettingsViewer(EmbedInEditor):
+    '''
+    A hacked up settings editor
+    '''
     def on_load(self):
         # TODO see Clock and rate limiting  for Page.on_load
         groups = defaultdict(list)
