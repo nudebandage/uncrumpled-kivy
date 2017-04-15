@@ -1,1 +1,2 @@
 include kivygui/fonts/*.ttf
+include kivygui/*.kv
