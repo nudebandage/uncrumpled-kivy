@@ -1,3 +1,2 @@
 include kivygui/fonts/*.ttf
-include kivygui/*.kv
-include kivygui/uncrumpled.png
+recursive-include kivygui *.kv *.png
