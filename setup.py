@@ -12,6 +12,7 @@ setup(
             'Intended Audience :: Developers',
             'License :: OSI Approved :: BSD License',
             'Programming Language :: Python :: 3'],
+    include_package_data=True,
 
     keywords = 'uncrumpled gui kivy ui',
 
