@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'uncrumpled_kivygui',
-    version='0.1.0',
+    version='0.1.1',
     description = 'kivygui for uncrumpled',
     author='tmothy eichler',
     author_email='tim_eichler@hotmail.com',
